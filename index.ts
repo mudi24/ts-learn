@@ -12,4 +12,8 @@ console.log(b1);
 console.log(v2);
 
 
+let obj:unknown = { name: '', handle: ()=>{}}
+
+// console.log(obj.name);
+// obj.unknown()
 

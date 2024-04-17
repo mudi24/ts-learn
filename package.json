@@ -1,0 +1,15 @@
+{
+  "name": "TS",
+  "version": "1.0.0",
+  "description": "``` npm i typescript -g ``` ### 验证是否下载成功 ``` tsc -v ``` ### 初始化 ts（会生成一个ts.config.json文件） ``` tsc --init ``` ### 监听 ts 文件变化 ``` tsc -w  ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.12.7"
+  }
+}
