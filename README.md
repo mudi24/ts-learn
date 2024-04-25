@@ -152,3 +152,109 @@ let fn:Fn = function(name){
   return [1]
 }
 ```
+
+## 数组类型
+
+* number[]
+* Array<boolean>
+* 数组普通类型
+ 
+ ```js
+// 定义对象数组使用 interface
+  interface X{
+    name: string,
+    age?: number
+  }
+  let arr:X[] = [{name:'red'}, {name:' green'}]
+```
+### 二维数组
+
+* number[][]
+* Array<Array<number>>
+
+
+### 包括多种数据类型的数组类型
+
+* any[]
+* [number, string, boolean, {}] （元组）
+
+
+```js
+function a(...args:string[]){
+  console.log(...args)
+}
+
+a('1','2')
+```
+
+```js
+function a(...args:string[]){
+  let b:IArguments = arguments
+}
+
+a('1','2')
+// IArguments 等同于下面的 interface 
+interface A{
+  callee: Function,
+  length: number,
+  [index: number]: any
+}
+```
+
+## 函数类型
+
+1. 函数定义类型和返回类型 ｜ 函数定义类型和返回类型
+2. 函数默认参数 ｜ 函数可选参数
+3. 参数是一个对象如何定义
+4. 函数 this 类型
+5. 函数重载
+ 
+```js
+function add(a:number, b:number):number{
+  return a+b
+}
+const add = (a:number, b:number):number => a+b
+// 2. 函数默认参数 ｜ 函数可选参数
+function add(a:number = 10, b?:number):number{
+  return a+b
+}
+// 3. 参数是一个对象如何定义
+interface User = {
+  name: String,
+  age: number
+}
+function add(user: User):User {
+  return user
+}
+// 4. 函数 this 类型
+interface Obj = {
+  user: number[],
+  add: (this:Obj, num:number)=> void
+}
+// ts 可以定义 this 的类型，在 js中无法使用 必须是第一个参数定义 this 的类型
+let obj:Obj = {
+  user: [1,2],
+  add(this:Obj, num:number) {
+    return this.user.push(num)
+  } 
+}
+obj.add(4)
+// 5. 函数重载
+let user:number[] = [1,2,3]
+function findNum(id:number):number[] // 如果传入的是id，就是单个查询
+function findNum():number[]  // 如果没有传入参数，就是查询全部
+function findNum(ids?: number[]| number):number[]{
+  if(typeof ids === 'number'){
+    return users.filter(v => v == ids)
+  }else if(Array.isArray(ids)){
+    user.push(...ids)  // 添加 id
+    return user
+  }else{
+    return user
+  }
+  return 
+}
+findNum(1)
+findNum()
+findNum([4,5,6])
+``` 
