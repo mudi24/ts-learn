@@ -10,3 +10,4 @@ console.log(str);
 console.log(num);
 console.log(b1);
 console.log(v2);
+

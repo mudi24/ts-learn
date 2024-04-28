@@ -258,3 +258,302 @@ findNum(1)
 findNum()
 findNum([4,5,6])
 ``` 
+
+## 联合类型
+
+```js
+let a:number | string = '0234'
+
+let fn = function (type: number | boolean):boolean {
+  return !!type
+}
+
+fn(1)
+fn(false)
+```
+
+## 交叉类型
+
+```js
+interface People {
+  name: string,
+  age: number
+}
+interface Man{
+  sex: number
+}
+const newMan = (man: People & Man):void => {}
+newMan({
+  name: 'red',
+  age: 18,
+  sex: 1
+})
+```
+
+## 类型断言
+
+```js
+let fn = function (num: number | string):void {
+  console.log((num as string).length) // 断言的第一种写法
+}
+fn(123) // undefined
+fn('123') // 3
+
+
+interface A{
+  run: string
+}
+interface B {
+  build: string
+}
+let fn = (type: A | B):void =>{
+  console.log((<A>type).run)  // 断言的第二种写法
+}
+
+fn({run: '123'})
+fn({build: '456'})
+
+
+(window as any).abc = '123'
+```
+
+
+## 内置对象（浏览器对象）
+
+```js
+let num:Number = new Number(1)
+let date:Date = new Date()
+let reg:RegExp = new RegExp(/\w/)
+let err:Error = new Error()
+let xhr:XMLHttpRequest = new XMLHttpRequest()
+```
+
+```js
+// HTML (元素名称) Element HTMLElement
+let div = document.querySelector('div')
+let div = document.querySelector('div') as HTMLElement
+
+let div:NodeList = document.querySelectorAll('div')
+div.forEach()
+
+
+let div:NodeListOf<HTMLElement | HTMLDivElement> = document.querySelectorAll('div, footer')
+
+
+let local:Storage = localStorage
+let lo:Location = location
+let cookie:string = document.cookie // 注意
+
+let promise:Promise<number> = new Promise((r)=>r(1))
+
+promise.then(res => {
+  // 输入 res. 会有语法提示，弹出 number 类型的方法
+})
+```
+
+## class
+
+1. class 的基本用法 继承 和 类型约束 implements
+2. class 的修饰符 
+   1. readonly private（私有方法，只能在内部使用） 
+   2. protected（在内部和子类中使用） 
+   3. public（默认所有方法都是public，内部外部都可以使用）
+3. super 原理 
+4. 静态方法
+5. get set
+
+```js
+interface Options{
+  el: string | HTMLElement
+}
+
+interface VueCls {
+  options: Options,
+  init(): void
+}
+
+interface Vnode {
+  tag: string,
+  text?: string,
+  children: Vnode[]
+}
+
+class Dom {
+  private createElement(el: string){
+    return document.createElement(el)
+  },
+  setText(el: HTMLElement, text: string | null){
+    el.textContent = text
+  },
+  render(data: Vnode){
+    let root = document.createElement(data.tag)
+    if(data.children && Array.isArray(data.children)){
+      data.children.forEach(item => {
+        let child = this.render(item)
+        root.appendChild(child)
+      })
+    }else{
+      this.setText(root, data.text)
+    }
+    return root 
+  }
+}
+class Vue extends Dom implements VueCls{
+  readonly options: Options,
+  constructor(options: Options){
+    super() // 父类的prototype.constructor.call
+    this.options = options
+    this.init()
+    // super.render() // 调用父类的 render 方法
+  },
+  static version(){ // 静态方法
+    // 静态方法只能调用其他的静态方法
+    return '1.0.0'
+  }
+  init(): void {
+    let data: Vnode ={
+      tag: 'div',
+      children: [
+        {
+          tag: 'div',
+          text: '子节点1'
+        },
+        {
+          tag: 'div',
+          text: '子节点2'
+        }
+      ]
+    }
+    
+    let app = typeof this.options.el == 'string' ? document.querySelector(this.options.el) : this.options.el
+    app.appendChild(this.render(data))
+  }
+}
+
+new Vue({
+  el: '#app'
+})
+```
+
+```js
+class Ref {
+  _value: any,
+  constructor(value: any){
+    this._value = value
+  },
+  get value(){
+    return this._value + '123'
+  },
+  set value(newValue){
+    this._value = newValue + 'set'
+  }
+}
+
+const ref = new Ref('哈哈哈')
+console.log(ref.value)
+```
+
+## 抽象类
+
+* abstract 所定义的抽象类
+* abstract 所定义的方法 都只能描述不能进行一个实现
+* 抽象类无法被实例化
+
+```js
+abstract class Vue {
+  name: string,
+  constructor(name?: string){
+    this.name = name
+  },
+  getName():string{
+    return this.name
+  }
+  abstract init(name:string):void 
+}
+
+class React extends Vue { // 派生类
+  constructor(){
+    super()
+  }
+  init(name: string){
+
+  }
+  setName(name:string){
+    this.name = name
+  }
+}
+
+const react = new React()
+react.setName('123')
+
+console.log(react.getName())
+```
+
+## 元组类型
+
+```js
+let arr:[string, number] = ['2', 3]
+arr.push(4) // 可以
+arr.push(false) // 不可以，越界元素，只能添加元组内定义的类型
+
+const arr:readonly[x:string, y?:number] = ['1']
+
+let excel:[string, string, number][] = [
+  ['mike', '男', 18],
+  ['mike', '男', 18],
+  ['mike', '男', 18],
+]
+
+
+const arr:readonly[x:string, y:number] = ['1', 2]
+type first = typeof arr[0]  // number
+type first = typeof arr['length'] // 2
+```
+
+## 枚举类型
+
+1. 数字枚举
+```js
+enum Color{
+  red,
+  green, 
+  blue
+}
+
+console.log(Color.red) // 0
+console.log(Color.green) // 1
+console.log(Color.blue) // 2
+// 自定义枚举
+enum Color{
+  red = 1,
+  green = 5, 
+  blue = 6
+}
+// 增长枚举
+enum Color{
+  red = 1,
+  green, 
+  blue
+}
+
+console.log(Color.red) // 1
+console.log(Color.green) // 2
+console.log(Color.blue) // 3
+```
+
+2. 字符串枚举
+```js
+enum Color{
+  red = 'red'
+  green = 'green'
+  blue = 'blue'
+}
+```
+
+3. 异构枚举
+```js
+enum Color{
+  yes = 1,
+  no = '2'
+}
+```

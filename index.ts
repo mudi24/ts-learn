@@ -17,3 +17,16 @@ let obj:unknown = { name: '', handle: ()=>{}}
 // console.log(obj.name);
 // obj.unknown()
 
+interface A{
+  run: string
+}
+interface B {
+  build: string
+}
+let fn = (type: A | B):void =>{
+  console.log((<A>type).run)
+}
+
+
+let div:NodeListOf<HTMLElement | HTMLDivElement> = document.querySelectorAll('div, footer')
+
