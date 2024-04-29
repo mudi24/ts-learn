@@ -557,3 +557,145 @@ enum Color{
   no = '2'
 }
 ```
+4. 接口枚举
+
+```js
+   enum Types {
+      yyds,
+      dddd
+   }
+   interface A {
+      red:Types.yyds
+   }
+ 
+   let obj:A = {
+      red:Types.yyds
+   }
+```
+
+5. const 枚举
+  
+let  和 var 都是不允许的声明只能使用const
+
+编译后：
+
+* const 声明的枚举会被编译成常量
+* 普通声明的枚举编译完后是个对象
+
+
+```js
+const enum Types{
+   No = "No",
+   Yes = 1,
+}
+```
+
+6. 反向映射
+
+
+```js
+enum Enum {
+   fall
+}
+let a = Enum.fall;
+console.log(a); //0
+let nameOfA = Enum[a]; 
+console.log(nameOfA); //fall
+```
+字符串不支持 反向映射
+
+```js
+enum Enum {
+   success = '456' // 这里不支持字符串
+}
+let success:string = Enum.success;
+let key = Enum[success]
+```
+
+## 类型推论
+
+1. 声明变量赋值，没有定义类型
+2. 声明变量不赋值，没有定义类型
+
+```js
+let str = '345'
+str = 123 // 报错
+str = '123' // 正确
+```
+
+```js
+let str
+
+str = 123 // 正确
+str = '123' // 正确
+str = true // 正确
+```
+
+## 类型别名
+
+* 定义类型别名
+* 定义函数别名
+* 定义联合类型别名
+* 定义值的别名
+
+```js
+type str = string
+ 
+ 
+let s:str = "345"
+ 
+console.log(s);
+```
+
+```js
+type str = () => string
+ 
+ 
+let s: str = () => "6"
+ 
+console.log(s);
+```
+
+```js
+type str = string | number
+ 
+ 
+let s: str = 123
+ 
+let s2: str = '123'
+ 
+console.log(s,s2);
+```
+
+```js
+type value = boolean | 0 | '213'
+ 
+ 
+let s:value = true
+//变量s的值  只能是上面value定义的值
+```
+
+### type 和 interface 的区别
+
+1. interface 可以使用 extends 关键字进行继承，type 不可以继承
+2. type 可以使用联合类型或交叉类型，interface 不可以
+3. interface 遇到重名的会合并内部属性， type 不可以出现重名的情况
+
+
+### type 高级用法
+
+extends 关键字
+
+```js
+type a = 1 extends number ? 1 : 0 //1
+ 
+type a = 1 extends Number ? 1 : 0 //1
+ 
+type a = 1 extends Object ? 1 : 0 //1
+ 
+type a = 1 extends any ? 1 : 0 //1
+ 
+type a = 1 extends unknow ? 1 : 0 //1
+ 
+type a = 1 extends never ? 1 : 0 //0
+```

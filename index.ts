@@ -29,4 +29,3 @@ let fn = (type: A | B):void =>{
 
 
 let div:NodeListOf<HTMLElement | HTMLDivElement> = document.querySelectorAll('div, footer')
-
