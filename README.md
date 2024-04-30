@@ -699,3 +699,213 @@ type a = 1 extends unknow ? 1 : 0 //1
  
 type a = 1 extends never ? 1 : 0 //0
 ```
+
+## never
+
+```js
+// 返回never的函数必须存在无法达到的终点
+ 
+// 因为必定抛出异常，所以 error 将不会有返回值
+function error(message: string): never {
+    throw new Error(message);
+}
+ 
+// 因为存在死循环，所以 loop 将不会有返回值
+function loop(): never {
+    while (true) {
+    }
+}
+```
+
+### never 和 void 的区别
+
+1. void类型只是没有返回值 但本身不会出错， never 只会抛出异常没有返回值
+
+```js
+    function Void():void {
+        console.log();
+    }
+ 
+   
+    function Never():never {
+      throw new Error('aaa')
+    }
+```
+
+2. 当我们鼠标移上去的时候会发现 只有void和number，never在联合类型中会被直接移除
+
+```js
+type A = void | number | never
+```
+
+### never 常见的应用场景
+
+```js
+type A = '小杯' | '大杯' | '超大杯' 
+ 
+function isXiaoMan(value:A) {
+   switch (value) {
+       case "小杯":
+           break 
+       case "大杯":
+          break 
+       case "超大杯":
+          break 
+       default:
+          //是用于场景兜底逻辑
+          const error:never = value;
+          return error
+   }
+}
+```
+
+## Symbol
+
+Symbol 会创建一个唯一的值
+```js
+let a1:symbol = Symbol(1)
+let a2:symbol = Symbol(1)
+
+a1 == a2 // false
+
+// 创建两个相同的 symbol 的方法
+Symbol.for(1) === Symbol.for(1) // true 
+
+// Symbol.for 会在 全局Symbol 中查找有没有注册过这个 key，如果有则直接用，如果没有则创建一个
+```
+for in 遍历、Object.keys 遍历、getOwnPropertyNames、 JSON.stringfy 都无法拿到对象中的 symbol
+```js
+const symbol1 = Symbol('666')
+const symbol2 = Symbol('777')
+const obj1= {
+   [symbol1]: '小满',
+   [symbol2]: '二蛋',
+   age: 19,
+   sex: '女'
+}
+// 1 for in 遍历
+for (const key in obj1) {
+   // 注意在console看key,是不是没有遍历到symbol1
+   console.log(key)
+}
+// 2 Object.keys 遍历
+Object.keys(obj1)
+console.log(Object.keys(obj1))
+// 3 getOwnPropertyNames
+console.log(Object.getOwnPropertyNames(obj1))
+// 4 JSON.stringfy
+console.log(JSON.stringify(obj1))
+```
+
+如何拿到 对象中的 symbol 属性
+
+```js
+// 1 拿到具体的symbol 属性,对象中有几个就会拿到几个
+Object.getOwnPropertySymbols(obj1)
+console.log(Object.getOwnPropertySymbols(obj1))  // 只拿到了对象中为 symbol 的key
+// 2 es6 的 Reflect 拿到对象的所有属性
+Reflect.ownKeys(obj1)
+console.log(Reflect.ownKeys(obj1))  // 拿到了对象中全部的key
+```
+
+## 生成器
+
+```js
+function* gen(){
+  yield Promise.resolve('1')
+  yield '2'
+  yield '3'
+  yield '4'
+}
+
+const man = gen()
+console.log(man.next());  //{ value: 1, done: false }
+console.log(man.next());  //{ value: 2, done: false }
+console.log(man.next());  //{ value: 3, done: false }
+console.log(man.next());  //{ value: 4, done: false }
+console.log(man.next());  //{ value: undefined, done: true }
+```
+
+## 迭代器
+
+支持遍历大部分类型迭代器 arr nodeList argumetns set map 等
+
+```js
+var arr = [1,2,3,4];
+let iterator = arr[Symbol.iterator]();
+ 
+console.log(iterator.next());  //{ value: 1, done: false }
+console.log(iterator.next());  //{ value: 2, done: false }
+console.log(iterator.next());  //{ value: 3, done: false }
+console.log(iterator.next());  //{ value: 4, done: false }
+console.log(iterator.next());  //{ value: undefined, done: true }
+```
+
+### 使用 iterator 实现 for of 
+
+```js
+function each(value: any){
+  let It:any = value[Symbol.iterator]()
+  let next:any = {done:false}
+  while(!next.done){
+    next = It.next()
+    if(!next.done){
+      console.log(next.value)
+    }
+  }
+}
+// each(arr)
+```
+
+### for of 迭代器的语法糖
+
+```js
+for (let value of map) {
+    console.log(value)
+}
+```
+
+### for of 是不能循环对象的，因为对象没有 iterator 
+
+### 数组解构的原理其实也是调用迭代器的
+
+```js
+var [a,b,c] = [1,2,3]
+ 
+var x = [...xxxx]
+```
+
+### 自己实现一个迭代器来使对象支持 iterator
+
+```js
+ 
+const obj = {
+    max: 5,
+    current: 0,
+    [Symbol.iterator]() {
+        return {
+            max: this.max,
+            current: this.current,
+            next() {
+                if (this.current == this.max) {
+                    return {
+                        value: undefined,
+                        done: true
+                    }
+                } else {
+                    return {
+                        value: this.current++,
+                        done: false
+                    }
+                }
+            }
+        }
+    }
+}
+console.log([...obj])
+ 
+for (let val of obj) {
+   console.log(val);
+   
+}
+```
