@@ -909,3 +909,129 @@ for (let val of obj) {
    
 }
 ```
+
+## 泛型
+
+动态类型
+
+```js
+function add<T>(a:T, b:T):Array<T>{
+  return a + b
+}
+add(1, 2)
+add('1', '2')
+add(true, false)
+```
+
+使用类型别名的方式使用泛型
+
+```js
+type A<T> = string | number | T
+
+let a:A<boolean> = 1
+let a:A<boolean> = '12'
+let a:A<boolean> = false
+let a:A<undefined> = undefined
+let a:A<null> = null
+```
+
+```js
+interface Data<T>{
+  msg: T
+}
+
+let data:Data<string> = {
+  msg: '344'
+}
+```
+
+```js
+function add<T, K>(a:T, b:K)Array<T | K> {
+  return [a, b]
+}
+add(false, 1)
+
+function add<T = number, K = number>(a:T, b:K)Array<T | K> {
+  return [a, b]
+}
+add(false, 1)
+```
+
+泛型在工作中的应用
+```js
+const axios = {
+  get<T>(url: string):Promise<T> {
+    return new Promise((resolve, reject) => {
+      let xhr:XMLHttpRequest = new XMLHttpRequest()
+      xhr.open('GET', url)
+      xhr.onreadystatechange = () => {
+        if(xhr.readyState === 4 && xhr.status == 200){
+          resolve(JSON.parse(xhr.responseText))
+        }
+      }
+      xhr.send(null)
+    })
+  }
+}    
+
+
+interface Data {
+  message: string,
+  code: number
+}
+axios.get('data.json').then(res:Data => {
+  console.log(res)
+})
+```
+
+### 泛型约束
+
+```js
+// 在类型后面跟一个 extends 再跟一个类型约束
+function add<T extends number>(a:T, b:T){
+  return a + b
+}
+```
+
+```js
+// 使用泛型约束来控制类型的范围
+interface Len {
+  length: number
+}
+function fn<T extends Len>(a: T){
+  a.length
+}
+
+fn('123')
+fn([1,2,4])
+fn(1234) // 报错
+fn(false) // 报错
+```
+
+#### keyof
+
+```js
+let obj = {
+  name: '23',
+  sex: '男'
+}
+
+function ob<T extends object, K extends keyof T> (object:T, key:K){
+  return object[key]
+}
+ob(obj, 'name')
+```
+
+```js
+interface Data {
+  name: string,
+  sex: string,
+  age: number
+}
+// for in
+type Options<T extends object>{
+  readonly [Key in keyof T] : T[Key]
+}
+
+type B = Options<Data>
+```
