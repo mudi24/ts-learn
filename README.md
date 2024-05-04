@@ -1140,3 +1140,105 @@ tsc --init
 
 10.module
 默认common.js  可选es6模式 amd  umd 等
+
+
+## namespace
+
+namespace 用来避免全局变量造成的污染
+
+* 内部模块，主要用于组织代码，避免命名冲突。
+* 命名空间内的类默认私有
+* 通过 export 暴露
+* 通过 namespace 关键字定义
+
+```js
+namespace a {
+    export const Time: number = 1000
+    export const fn = <T>(arg: T): T => {
+        return arg
+    }
+    fn(Time)
+}
+ 
+ 
+namespace b {
+     export const Time: number = 1000
+     export const fn = <T>(arg: T): T => {
+        return arg
+    }
+    fn(Time)
+}
+ 
+a.Time
+b.Time
+```
+嵌套命名空间
+```js
+namespace a {
+    export namespace b {
+        export class Vue {
+            parameters: string
+            constructor(parameters: string) {
+                this.parameters = parameters
+            }
+        }
+    }
+}
+ 
+let v = a.b.Vue
+ 
+new v('1')
+```
+
+抽离命名空间
+
+```js
+// a.ts
+export namespace V {
+    export const a = 1
+}
+// b.ts
+import {V} from '../observer/index'
+ 
+console.log(V);
+```
+
+简化命名空间
+```js
+namespace A  {
+    export namespace B {
+        export const C = 1
+    }
+}
+ 
+import X = A.B.C
+ 
+console.log(X);
+```
+合并命名空间，重名的命名空间会合并
+### namespace 常用场景
+
+跨端的项目 h5 Android ios 小程序等等
+
+```js
+namespace ios{
+  export const pushNotification = (msg:string,type:number) => {
+
+  }
+}
+namespace android{
+  export const pushNotification = (msg:string,type:number) => {
+    
+  }
+}
+namespace h5{
+  export const pushNotification = (msg:string,type:number) => {
+    
+  }
+}
+namespace miniprogram{
+  export const pushNotification = (msg:string,type:number) => {
+    
+  }
+}
+```
